@@ -1,0 +1,459 @@
+<!-- ============================================================
+  PEAKS AND VALLEYS CONSTRUCTION — ID Badge Request Form
+  Paste this into a GHL Funnel Page using the "Custom Code" element
+  Replace YOUR_WEBHOOK_URL with your deployed server URL
+  e.g. https://pvc-badge.railway.app/badge
+  ============================================================ -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .pvc-wrap {
+    min-height: 100vh;
+    background: #0f0f0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .pvc-card {
+    width: 100%;
+    max-width: 560px;
+    background: #161616;
+    border: 1.5px solid #C8912A;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .pvc-header {
+    background: #C8912A;
+    padding: 28px 32px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .pvc-header img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #1a1100;
+    flex-shrink: 0;
+  }
+  .pvc-header-text h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    color: #1a1100;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+  }
+  .pvc-header-text p {
+    font-size: 12px;
+    color: #3a2500;
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Body */
+  .pvc-body { padding: 32px; }
+
+  .pvc-intro {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 28px;
+    line-height: 1.6;
+    border-left: 2px solid #C8912A;
+    padding-left: 12px;
+  }
+
+  .pvc-field { margin-bottom: 20px; }
+
+  .pvc-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #C8912A;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .pvc-label span { color: #e05050; margin-left: 2px; }
+
+  .pvc-input {
+    width: 100%;
+    background: #1e1e1e;
+    border: 1px solid #2e2e2e;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .pvc-input::placeholder { color: #444; }
+  .pvc-input:focus {
+    border-color: #C8912A;
+    box-shadow: 0 0 0 3px rgba(200,145,42,0.12);
+  }
+  .pvc-input.error { border-color: #e05050; }
+
+  /* Photo upload */
+  .pvc-photo-area {
+    border: 1.5px dashed #333;
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    background: #1a1a1a;
+  }
+  .pvc-photo-area:hover, .pvc-photo-area.dragover {
+    border-color: #C8912A;
+    background: #1e1a10;
+  }
+  .pvc-photo-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .pvc-photo-icon {
+    width: 48px; height: 48px;
+    background: #252525;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .pvc-photo-icon svg { width: 22px; height: 22px; stroke: #C8912A; fill: none; stroke-width: 1.8; }
+  .pvc-photo-label { font-size: 13px; color: #aaa; line-height: 1.5; }
+  .pvc-photo-label strong { color: #C8912A; }
+  .pvc-photo-hint { font-size: 11px; color: #555; margin-top: 6px; }
+
+  /* Preview */
+  #pvc-preview {
+    display: none;
+    position: relative;
+    width: 90px; height: 90px;
+    margin: 0 auto;
+  }
+  #pvc-preview img {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #C8912A;
+  }
+  #pvc-preview-remove {
+    position: absolute; top: -4px; right: -4px;
+    width: 22px; height: 22px;
+    background: #e05050;
+    border: none; border-radius: 50%;
+    color: white; font-size: 13px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+  }
+
+  /* Row */
+  .pvc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 460px) { .pvc-row { grid-template-columns: 1fr; } }
+
+  /* Divider */
+  .pvc-divider {
+    border: none;
+    border-top: 1px solid #222;
+    margin: 28px 0;
+  }
+
+  /* Submit */
+  .pvc-btn {
+    width: 100%;
+    background: #C8912A;
+    color: #1a1100;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .pvc-btn:hover { background: #dba030; }
+  .pvc-btn:active { transform: scale(0.98); }
+  .pvc-btn:disabled { background: #5a4010; color: #333; cursor: not-allowed; }
+
+  /* Status messages */
+  .pvc-status {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .pvc-status.success {
+    display: block;
+    background: rgba(29,158,117,0.12);
+    border: 1px solid #1D9E75;
+    color: #5DCAA5;
+  }
+  .pvc-status.error {
+    display: block;
+    background: rgba(224,80,80,0.1);
+    border: 1px solid #e05050;
+    color: #f08080;
+  }
+
+  /* Spinner */
+  .pvc-spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(26,17,0,0.3);
+    border-top-color: #1a1100;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Footer note */
+  .pvc-footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: #444;
+    margin-top: 20px;
+    font-style: italic;
+  }
+</style>
+
+<div class="pvc-wrap">
+  <div class="pvc-card">
+
+    <!-- Header -->
+    <div class="pvc-header">
+      <img src="https://i.imgur.com/placeholder.png"
+           onerror="this.style.display='none'"
+           alt="Peaks and Valleys Construction logo"/>
+      <div class="pvc-header-text">
+        <h1>PEAKS AND VALLEYS<br>CONSTRUCTION</h1>
+        <p>EMPLOYEE ID BADGE REQUEST</p>
+      </div>
+    </div>
+
+    <!-- Form body -->
+    <div class="pvc-body">
+      <p class="pvc-intro">
+        Fill out the form below to generate your print-ready ID badge.
+        Your badge will be emailed to you and to our office within minutes.
+      </p>
+
+      <form id="pvc-form" novalidate>
+
+        <!-- Photo upload -->
+        <div class="pvc-field">
+          <label class="pvc-label">Headshot Photo <span>*</span></label>
+          <div class="pvc-photo-area" id="pvc-drop-zone">
+            <input type="file" id="pvc-photo-input" name="headshot"
+                   accept="image/jpeg,image/png,image/webp" required/>
+            <div id="pvc-upload-ui">
+              <div class="pvc-photo-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M9 5l1.5-2h3L15 5"/></svg>
+              </div>
+              <p class="pvc-photo-label"><strong>Click to upload</strong> or drag &amp; drop</p>
+              <p class="pvc-photo-hint">JPG, PNG, WEBP · Square headshot recommended · Max 10MB</p>
+            </div>
+            <div id="pvc-preview">
+              <img id="pvc-preview-img" src="" alt="Preview"/>
+              <button type="button" id="pvc-preview-remove">&#x2715;</button>
+            </div>
+          </div>
+        </div>
+
+        <hr class="pvc-divider"/>
+
+        <!-- Name -->
+        <div class="pvc-field">
+          <label class="pvc-label" for="pvc-name">Full Name <span>*</span></label>
+          <input class="pvc-input" type="text" id="pvc-name" name="full_name"
+                 placeholder="Jane Smith" autocomplete="name" required/>
+        </div>
+
+        <!-- Title -->
+        <div class="pvc-field">
+          <label class="pvc-label" for="pvc-title">Job Title <span>*</span></label>
+          <input class="pvc-input" type="text" id="pvc-title" name="job_title"
+                 placeholder="Sales Representative" required/>
+        </div>
+
+        <!-- Phone + Email row -->
+        <div class="pvc-row">
+          <div class="pvc-field">
+            <label class="pvc-label" for="pvc-phone">Phone <span>*</span></label>
+            <input class="pvc-input" type="tel" id="pvc-phone" name="phone"
+                   placeholder="555-987-6543" autocomplete="tel" required/>
+          </div>
+          <div class="pvc-field">
+            <label class="pvc-label" for="pvc-email">Email <span>*</span></label>
+            <input class="pvc-input" type="email" id="pvc-email" name="email"
+                   placeholder="jane@peaksroofs.com" autocomplete="email" required/>
+          </div>
+        </div>
+
+        <hr class="pvc-divider"/>
+
+        <button type="submit" class="pvc-btn" id="pvc-submit">
+          GENERATE MY BADGE
+        </button>
+
+        <div class="pvc-status" id="pvc-status"></div>
+
+        <p class="pvc-footer-note">
+          Your badge will be emailed to you and to office@peaksroofs.com
+        </p>
+
+      </form>
+    </div><!-- /pvc-body -->
+  </div><!-- /pvc-card -->
+</div><!-- /pvc-wrap -->
+
+<script>
+(function () {
+  // ── CONFIG — replace with your deployed server URL ──────────────────────
+  var WEBHOOK_URL = "YOUR_WEBHOOK_URL/badge";
+  // ────────────────────────────────────────────────────────────────────────
+
+  var form       = document.getElementById("pvc-form");
+  var photoInput = document.getElementById("pvc-photo-input");
+  var dropZone   = document.getElementById("pvc-drop-zone");
+  var uploadUI   = document.getElementById("pvc-upload-ui");
+  var preview    = document.getElementById("pvc-preview");
+  var previewImg = document.getElementById("pvc-preview-img");
+  var removeBtn  = document.getElementById("pvc-preview-remove");
+  var submitBtn  = document.getElementById("pvc-submit");
+  var statusEl   = document.getElementById("pvc-status");
+
+  // ── Photo preview ────────────────────────────────────────────────────────
+  function showPreview(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      previewImg.src = e.target.result;
+      uploadUI.style.display  = "none";
+      preview.style.display   = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  photoInput.addEventListener("change", function () {
+    if (this.files[0]) showPreview(this.files[0]);
+  });
+
+  removeBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    photoInput.value = "";
+    previewImg.src = "";
+    preview.style.display  = "none";
+    uploadUI.style.display = "block";
+  });
+
+  // Drag and drop
+  dropZone.addEventListener("dragover",  function (e) { e.preventDefault(); this.classList.add("dragover"); });
+  dropZone.addEventListener("dragleave", function ()  { this.classList.remove("dragover"); });
+  dropZone.addEventListener("drop",      function (e) {
+    e.preventDefault();
+    this.classList.remove("dragover");
+    var f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith("image/")) {
+      var dt = new DataTransfer();
+      dt.items.add(f);
+      photoInput.files = dt.files;
+      showPreview(f);
+    }
+  });
+
+  // ── Validation ────────────────────────────────────────────────────────────
+  function validate() {
+    var ok = true;
+    ["pvc-name","pvc-title","pvc-phone","pvc-email"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el.value.trim()) {
+        el.classList.add("error"); ok = false;
+      } else {
+        el.classList.remove("error");
+      }
+    });
+    if (!photoInput.files[0]) {
+      dropZone.style.borderColor = "#e05050"; ok = false;
+    } else {
+      dropZone.style.borderColor = "";
+    }
+    return ok;
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!validate()) {
+      showStatus("error", "Please fill in all required fields and upload a photo.");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="pvc-spinner"></span>Generating your badge…';
+    hideStatus();
+
+    var fd = new FormData();
+    fd.append("full_name", document.getElementById("pvc-name").value.trim());
+    fd.append("job_title",  document.getElementById("pvc-title").value.trim());
+    fd.append("phone",      document.getElementById("pvc-phone").value.trim());
+    fd.append("email",      document.getElementById("pvc-email").value.trim());
+    fd.append("headshot",   photoInput.files[0]);
+
+    fetch(WEBHOOK_URL, { method: "POST", body: fd })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (res.ok && res.data.success) {
+          submitBtn.innerHTML = "GENERATE MY BADGE";
+          submitBtn.disabled  = false;
+          showStatus("success",
+            "&#x2713; Your badge has been generated and emailed to " +
+            document.getElementById("pvc-email").value +
+            " and to office@peaksroofs.com. Check your inbox in the next few minutes!"
+          );
+          form.reset();
+          previewImg.src = "";
+          preview.style.display  = "none";
+          uploadUI.style.display = "block";
+        } else {
+          throw new Error(res.data.error || "Unknown error");
+        }
+      })
+      .catch(function (err) {
+        submitBtn.innerHTML = "GENERATE MY BADGE";
+        submitBtn.disabled  = false;
+        showStatus("error",
+          "Something went wrong: " + err.message +
+          ". Please try again or email office@peaksroofs.com."
+        );
+      });
+  });
+
+  function showStatus(type, msg) {
+    statusEl.className  = "pvc-status " + type;
+    statusEl.innerHTML  = msg;
+    statusEl.style.display = "block";
+    statusEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function hideStatus() {
+    statusEl.style.display = "none";
+    statusEl.className = "pvc-status";
+  }
+
+})();
+</script>
