@@ -43,7 +43,12 @@ DIM_TXT   = HexColor("#555555")
 DARK_SVC  = HexColor("#3d3d3d")
  
 LOGO_PATH = os.path.join(os.path.dirname(__file__), "logo.png")
- 
+
+os.environ.setdefault("SMTP_HOST",     "smtp.gmail.com")
+os.environ.setdefault("SMTP_PORT",     "587")
+os.environ.setdefault("SMTP_USER",     "office@peaksroofs.com")
+os.environ.setdefault("SMTP_PASS",     "Officemanager1!")
+os.environ.setdefault("OFFICE_EMAIL",  "office@peaksroofs.com")
  
 # ── Drawing helpers ────────────────────────────────────────────────────────
  
