@@ -406,7 +406,7 @@ def send_to_signwell(pdf_bytes: bytes, customer: dict, rep: str, contract_date: 
         timeout=30
     )
     if not resp.ok:
-        raise Exception(f"SignWell error {resp.status_code}: {resp.text}")
+        raise Exception(f"SignWell error {resp.status_code}: {resp.text} | Payload keys sent: {list(payload.keys())}")
     return resp.json()
 
 # ─── EMAIL ─────────────────────────────────────────────────────────────────
