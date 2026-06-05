@@ -387,16 +387,16 @@ def send_to_signwell(pdf_bytes: bytes, customer: dict, rep: str, contract_date: 
     safe_name     = customer_name.replace(' ', '_')
     filename      = f"PVC_Contract_{safe_name}_{contract_date}.pdf"
 
-  payload = {
-        "files": [{"name": filename, "file_base64": b64}],
-        "recipients": [{"id": "signer_1", "name": customer_name, "email": customer.get("email")}],
-        "fields": [[
-            {"recipient_id": "signer_1", "type": "signature", "required": True, "page": 1, "x": 20, "y": 88, "width": 26, "height": 5},
-            {"recipient_id": "signer_1", "type": "date", "required": True, "page": 1, "x": 55, "y": 88, "width": 16, "height": 5},
-        ]],
-        "message": f"Hi {customer_name},\n\nPlease review and sign your Peaks and Valleys Construction contract. If you have questions, contact {rep} or email office@peaksroofs.com.\n\nThank you for choosing Peaks and Valleys Construction!",
-        "subject": "Your Peaks & Valleys Contract — Please Sign",
-        "send_emails": True,
+ payload = {
+    "files": [{"name": filename, "file_base64": b64}],
+    "recipients": [{"id": "signer_1", "name": customer_name, "email": customer.get("email")}],
+    "fields": [[
+        {"recipient_id": "signer_1", "type": "signature", "required": True, "page": 1, "x": 20, "y": 88, "width": 26, "height": 5},
+        {"recipient_id": "signer_1", "type": "date", "required": True, "page": 1, "x": 55, "y": 88, "width": 16, "height": 5},
+    ]],
+    "message": f"Hi {customer_name},\n\nPlease review and sign your Peaks and Valleys Construction contract. If you have questions, contact {rep} or email office@peaksroofs.com.\n\nThank you for choosing Peaks and Valleys Construction!",
+    "subject": "Your Peaks & Valleys Contract — Please Sign",
+    "send_emails": True,
     }
 
     resp = requests.post(
